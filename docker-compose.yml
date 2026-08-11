@@ -1,0 +1,17 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: pustakaalay-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: pustakaalay_root
+      MYSQL_DATABASE: pustakaalay_db
+      MYSQL_USER: pustakaalay
+      MYSQL_PASSWORD: pustakaalay123
+    ports:
+      - "3306:3306"
+    volumes:
+      - pustakaalay-mysql-data:/var/lib/mysql
+
+volumes:
+  pustakaalay-mysql-data:
