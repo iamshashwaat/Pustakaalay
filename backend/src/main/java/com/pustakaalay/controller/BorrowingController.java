@@ -3,12 +3,16 @@ package com.pustakaalay.controller;
 import com.pustakaalay.dto.BorrowRequest;
 import com.pustakaalay.dto.BorrowingResponse;
 import com.pustakaalay.entity.Borrowing;
+import com.pustakaalay.entity.User;
 import com.pustakaalay.exception.ResourceNotFoundException;
 import com.pustakaalay.repository.BorrowingRepository;
+import com.pustakaalay.repository.UserRepository;
 import com.pustakaalay.service.BorrowingService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,13 +23,16 @@ public class BorrowingController {
 
     private final BorrowingService borrowingService;
     private final BorrowingRepository borrowingRepository;
+    private final UserRepository userRepository;
 
     public BorrowingController(
             BorrowingService borrowingService,
-            BorrowingRepository borrowingRepository
+            BorrowingRepository borrowingRepository,
+            UserRepository userRepository
     ) {
         this.borrowingService = borrowingService;
         this.borrowingRepository = borrowingRepository;
+        this.userRepository = userRepository;
     }
 
     @PostMapping("/issue")
@@ -55,10 +62,23 @@ public class BorrowingController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BorrowingResponse>> getAllBorrowings() {
+    public ResponseEntity<List<BorrowingResponse>> getBorrowings(
+            Authentication authentication
+    ) {
+        List<Borrowing> borrowings;
+
+        if (isAdmin(authentication)) {
+            borrowings = borrowingRepository.findAll();
+        } else {
+            User currentUser = getCurrentUser(authentication);
+
+            borrowings = borrowingRepository.findByUserId(
+                    currentUser.getId()
+            );
+        }
+
         return ResponseEntity.ok(
-                borrowingRepository.findAll()
-                        .stream()
+                borrowings.stream()
                         .map(BorrowingResponse::new)
                         .toList()
         );
@@ -66,7 +86,8 @@ public class BorrowingController {
 
     @GetMapping("/{id}")
     public ResponseEntity<BorrowingResponse> getBorrowingById(
-            @PathVariable Long id
+            @PathVariable Long id,
+            Authentication authentication
     ) {
         Borrowing borrowing = borrowingRepository.findById(id)
                 .orElseThrow(() ->
@@ -75,8 +96,40 @@ public class BorrowingController {
                         )
                 );
 
+        if (!isAdmin(authentication)) {
+            User currentUser = getCurrentUser(authentication);
+
+            if (!borrowing.getUser().getId()
+                    .equals(currentUser.getId())) {
+
+                throw new ResponseStatusException(
+                        HttpStatus.FORBIDDEN,
+                        "You cannot access another user's borrowing"
+                );
+            }
+        }
+
         return ResponseEntity.ok(
                 new BorrowingResponse(borrowing)
+        );
+    }
+
+    private boolean isAdmin(Authentication authentication) {
+        return authentication.getAuthorities()
+                .stream()
+                .anyMatch(authority ->
+                        authority.getAuthority()
+                                .equals("ROLE_ADMIN")
+                );
+    }
+
+    private User getCurrentUser(Authentication authentication) {
+        return userRepository.findByEmail(
+                authentication.getName()
+        ).orElseThrow(() ->
+                new ResourceNotFoundException(
+                        "Authenticated user not found"
+                )
         );
     }
 }
