@@ -529,3 +529,56 @@ input {
     gap: 20px;
   }
 }
+
+.data-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.data-card {
+  background: white;
+  border: 1px solid #e3e7e4;
+  border-radius: 12px;
+  padding: 22px;
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+}
+
+.data-card h3 {
+  margin: 6px 0;
+}
+
+.data-card p {
+  margin: 0;
+  color: #747d78;
+}
+
+.data-meta {
+  min-width: 260px;
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 7px 18px;
+  align-content: center;
+}
+
+.data-meta span {
+  color: #89918d;
+  font-size: 12px;
+}
+
+.data-meta strong {
+  font-size: 12px;
+  text-align: right;
+}
+
+@media (max-width: 700px) {
+  .data-card {
+    flex-direction: column;
+  }
+
+  .data-meta {
+    min-width: 0;
+  }
+}
