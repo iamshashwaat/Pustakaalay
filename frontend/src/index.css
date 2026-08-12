@@ -678,3 +678,62 @@ input {
     flex-direction: column;
   }
 }
+
+.book-form select {
+  width: 100%;
+  border: 1px solid #d9dedb;
+  border-radius: 8px;
+  padding: 11px 12px;
+  background: white;
+  outline: none;
+}
+
+.book-form select:focus {
+  border-color: #174c3c;
+}
+
+.book-admin-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 18px;
+  padding-top: 15px;
+  border-top: 1px solid #edf0ee;
+}
+
+.book-admin-actions button {
+  flex: 1;
+  border: 1px solid #d9dedb;
+  background: white;
+  padding: 8px 7px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.book-admin-actions button:hover {
+  border-color: #174c3c;
+  color: #174c3c;
+}
+
+.book-admin-actions .danger-button {
+  color: #a52b2b;
+}
+
+.book-admin-actions .danger-button:hover {
+  border-color: #a52b2b;
+  color: #a52b2b;
+}
+
+.success-message {
+  background: #e9f6ef;
+  color: #17623d;
+  border: 1px solid #cae9d7;
+  padding: 12px 15px;
+  border-radius: 9px;
+  margin-bottom: 20px;
+}
+
+.form-card-header p {
+  color: #747d78;
+  margin: 6px 0 0;
+}
