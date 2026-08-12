@@ -8,6 +8,7 @@ import com.pustakaalay.exception.ResourceNotFoundException;
 import com.pustakaalay.repository.RoleRepository;
 import com.pustakaalay.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -17,13 +18,16 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public UserService(
             UserRepository userRepository,
-            RoleRepository roleRepository
+            RoleRepository roleRepository,
+            PasswordEncoder passwordEncoder
     ) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
@@ -133,8 +137,9 @@ public class UserService {
         user.setLastName(request.getLastName());
         user.setEmail(request.getEmail());
 
-        // Temporary plain storage until authentication module is added.
-        user.setPasswordHash(request.getPassword());
+        user.setPasswordHash(
+                passwordEncoder.encode(request.getPassword())
+        );
 
         user.setPhone(request.getPhone());
         user.setMembershipNumber(request.getMembershipNumber());
