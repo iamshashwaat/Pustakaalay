@@ -737,3 +737,26 @@ input {
   color: #747d78;
   margin: 6px 0 0;
 }
+
+.row-action {
+  display: flex;
+  align-items: center;
+}
+
+.row-action .primary-button {
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .data-card {
+    flex-wrap: wrap;
+  }
+
+  .row-action {
+    width: 100%;
+  }
+
+  .row-action .primary-button {
+    width: 100%;
+  }
+}
