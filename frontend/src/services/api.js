@@ -14,7 +14,11 @@ export async function apiRequest(endpoint, options = {}) {
    * Vite converts it back to Authorization before proxying to Spring Boot.
    */
   if (token) {
-    headers["X-Pustakaalay-Token"] = token;
+    if (import.meta.env.VITE_API_BASE_URL) {
+      headers.Authorization = `Bearer ${token}`;
+    } else {
+      headers["X-Pustakaalay-Token"] = token;
+    }
   }
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
