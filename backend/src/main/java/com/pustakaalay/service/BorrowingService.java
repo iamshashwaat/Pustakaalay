@@ -17,15 +17,18 @@ public class BorrowingService {
     private final BorrowingRepository borrowingRepository;
     private final BookCopyRepository bookCopyRepository;
     private final UserRepository userRepository;
+    private final FineService fineService;
 
     public BorrowingService(
             BorrowingRepository borrowingRepository,
             BookCopyRepository bookCopyRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            FineService fineService
     ) {
         this.borrowingRepository = borrowingRepository;
         this.bookCopyRepository = bookCopyRepository;
         this.userRepository = userRepository;
+        this.fineService = fineService;
     }
 
     @Transactional
@@ -83,8 +86,23 @@ public class BorrowingService {
             );
         }
 
-        borrowing.setReturnedAt(LocalDateTime.now());
+        LocalDateTime returnedAt = LocalDateTime.now();
+        boolean overdue = returnedAt.isAfter(borrowing.getDueAt());
+
+        borrowing.setReturnedAt(returnedAt);
         borrowing.setStatus(Borrowing.BorrowingStatus.RETURNED);
+
+        borrowingRepository.save(borrowing);
+
+        if (overdue) {
+            try {
+                fineService.createFineForBorrowing(
+                        borrowing.getId()
+                );
+            } catch (com.pustakaalay.exception.ConflictException ignored) {
+                // Fine may already exist for this borrowing.
+            }
+        }
 
         BookCopy bookCopy = borrowing.getBookCopy();
         bookCopy.setStatus(BookCopy.CopyStatus.AVAILABLE);

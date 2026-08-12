@@ -68,6 +68,17 @@ public class SecurityConfig {
                         ).hasRole("ADMIN")
 
                         .requestMatchers(
+                                "/api/fines/*/paid",
+                                "/api/fines/*/waive",
+                                "/api/fines/process-overdue",
+                                "/api/fines/borrowing/**"
+                        ).hasRole("ADMIN")
+
+                        .requestMatchers(
+                                "/api/fines/**"
+                        ).hasAnyRole("ADMIN", "MEMBER")
+
+                        .requestMatchers(
                                 "/api/books/**",
                                 "/api/book-copies/**",
                                 "/api/borrowings/**",
