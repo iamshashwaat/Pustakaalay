@@ -2,6 +2,7 @@ package com.pustakaalay.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -64,10 +65,7 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();
 
-        source.registerCorsConfiguration(
-                "/**",
-                configuration
-        );
+        source.registerCorsConfiguration("/**", configuration);
 
         return source;
     }
@@ -93,12 +91,8 @@ public class SecurityConfig {
                 )
 
                 .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(
-                                authenticationEntryPoint
-                        )
-                        .accessDeniedHandler(
-                                accessDeniedHandler
-                        )
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler)
                 )
 
                 .authorizeHttpRequests(auth -> auth
@@ -109,11 +103,50 @@ public class SecurityConfig {
                                 "/api/auth/**"
                         ).permitAll()
 
+                        // ADMIN-only user and role management
                         .requestMatchers(
                                 "/api/roles/**",
                                 "/api/users/**"
                         ).hasRole("ADMIN")
 
+                        // BOOK WRITE OPERATIONS -> ADMIN ONLY
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/books/**",
+                                "/api/book-copies/**"
+                        ).hasRole("ADMIN")
+
+                        .requestMatchers(
+                                HttpMethod.PUT,
+                                "/api/books/**",
+                                "/api/book-copies/**"
+                        ).hasRole("ADMIN")
+
+                        .requestMatchers(
+                                HttpMethod.DELETE,
+                                "/api/books/**",
+                                "/api/book-copies/**"
+                        ).hasRole("ADMIN")
+
+                        // BOOK READ OPERATIONS -> ADMIN + MEMBER
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/books/**",
+                                "/api/book-copies/**"
+                        ).hasAnyRole("ADMIN", "MEMBER")
+
+                        // BORROWING ACTIONS -> ADMIN ONLY
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/borrowings/**"
+                        ).hasRole("ADMIN")
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/borrowings/**"
+                        ).hasAnyRole("ADMIN", "MEMBER")
+
+                        // FINE ADMIN ACTIONS
                         .requestMatchers(
                                 "/api/fines/*/paid",
                                 "/api/fines/*/waive",
@@ -126,14 +159,8 @@ public class SecurityConfig {
                         ).hasAnyRole("ADMIN", "MEMBER")
 
                         .requestMatchers(
-                                "/api/books/**",
-                                "/api/book-copies/**",
-                                "/api/borrowings/**",
                                 "/api/reservations/**"
-                        ).hasAnyRole(
-                                "ADMIN",
-                                "MEMBER"
-                        )
+                        ).hasAnyRole("ADMIN", "MEMBER")
 
                         .anyRequest().authenticated()
                 )
