@@ -1,7 +1,9 @@
 package com.pustakaalay.controller;
 
 import com.pustakaalay.dto.BorrowRequest;
+import com.pustakaalay.dto.BorrowingResponse;
 import com.pustakaalay.entity.Borrowing;
+import com.pustakaalay.exception.ResourceNotFoundException;
 import com.pustakaalay.repository.BorrowingRepository;
 import com.pustakaalay.service.BorrowingService;
 import jakarta.validation.Valid;
@@ -27,7 +29,7 @@ public class BorrowingController {
     }
 
     @PostMapping("/issue")
-    public ResponseEntity<Borrowing> issueBook(
+    public ResponseEntity<BorrowingResponse> issueBook(
             @Valid @RequestBody BorrowRequest request
     ) {
         Borrowing borrowing = borrowingService.issueBook(
@@ -38,36 +40,43 @@ public class BorrowingController {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(borrowing);
+                .body(new BorrowingResponse(borrowing));
     }
 
     @PostMapping("/{id}/return")
-    public ResponseEntity<Borrowing> returnBook(
+    public ResponseEntity<BorrowingResponse> returnBook(
             @PathVariable Long id
     ) {
         return ResponseEntity.ok(
-                borrowingService.returnBook(id)
+                new BorrowingResponse(
+                        borrowingService.returnBook(id)
+                )
         );
     }
 
     @GetMapping
-    public ResponseEntity<List<Borrowing>> getAllBorrowings() {
+    public ResponseEntity<List<BorrowingResponse>> getAllBorrowings() {
         return ResponseEntity.ok(
                 borrowingRepository.findAll()
+                        .stream()
+                        .map(BorrowingResponse::new)
+                        .toList()
         );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Borrowing> getBorrowingById(
+    public ResponseEntity<BorrowingResponse> getBorrowingById(
             @PathVariable Long id
     ) {
-        return ResponseEntity.ok(
-                borrowingRepository.findById(id)
-                        .orElseThrow(() ->
-                                new IllegalArgumentException(
-                                        "Borrowing not found with id: " + id
-                                )
+        Borrowing borrowing = borrowingRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Borrowing not found with id: " + id
                         )
+                );
+
+        return ResponseEntity.ok(
+                new BorrowingResponse(borrowing)
         );
     }
 }

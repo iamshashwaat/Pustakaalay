@@ -1,6 +1,7 @@
 package com.pustakaalay.controller;
 
 import com.pustakaalay.dto.BookCopyRequest;
+import com.pustakaalay.dto.BookCopyResponse;
 import com.pustakaalay.entity.BookCopy;
 import com.pustakaalay.service.BookCopyService;
 import jakarta.validation.Valid;
@@ -21,64 +22,81 @@ public class BookCopyController {
     }
 
     @PostMapping
-    public ResponseEntity<BookCopy> createBookCopy(
+    public ResponseEntity<BookCopyResponse> createBookCopy(
             @Valid @RequestBody BookCopyRequest request
     ) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(bookCopyService.createBookCopy(request));
+                .body(new BookCopyResponse(
+                        bookCopyService.createBookCopy(request)
+                ));
     }
 
     @GetMapping
-    public ResponseEntity<List<BookCopy>> getAllBookCopies() {
+    public ResponseEntity<List<BookCopyResponse>> getAllBookCopies() {
         return ResponseEntity.ok(
                 bookCopyService.getAllBookCopies()
+                        .stream()
+                        .map(BookCopyResponse::new)
+                        .toList()
         );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BookCopy> getBookCopyById(
+    public ResponseEntity<BookCopyResponse> getBookCopyById(
             @PathVariable Long id
     ) {
         return ResponseEntity.ok(
-                bookCopyService.getBookCopyById(id)
+                new BookCopyResponse(
+                        bookCopyService.getBookCopyById(id)
+                )
         );
     }
 
     @GetMapping("/barcode/{barcode}")
-    public ResponseEntity<BookCopy> getByBarcode(
+    public ResponseEntity<BookCopyResponse> getByBarcode(
             @PathVariable String barcode
     ) {
         return ResponseEntity.ok(
-                bookCopyService.getByBarcode(barcode)
+                new BookCopyResponse(
+                        bookCopyService.getByBarcode(barcode)
+                )
         );
     }
 
     @GetMapping("/book/{bookId}")
-    public ResponseEntity<List<BookCopy>> getCopiesByBookId(
+    public ResponseEntity<List<BookCopyResponse>> getCopiesByBookId(
             @PathVariable Long bookId
     ) {
         return ResponseEntity.ok(
                 bookCopyService.getCopiesByBookId(bookId)
+                        .stream()
+                        .map(BookCopyResponse::new)
+                        .toList()
         );
     }
 
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<BookCopy>> getCopiesByStatus(
+    public ResponseEntity<List<BookCopyResponse>> getCopiesByStatus(
             @PathVariable BookCopy.CopyStatus status
     ) {
         return ResponseEntity.ok(
                 bookCopyService.getCopiesByStatus(status)
+                        .stream()
+                        .map(BookCopyResponse::new)
+                        .toList()
         );
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BookCopy> updateBookCopy(
+    public ResponseEntity<BookCopyResponse> updateBookCopy(
             @PathVariable Long id,
             @Valid @RequestBody BookCopyRequest request
     ) {
         return ResponseEntity.ok(
-                bookCopyService.updateBookCopy(id, request)
+                new BookCopyResponse(
+                        bookCopyService.updateBookCopy(id, request)
+                )
         );
     }
 
