@@ -760,3 +760,25 @@ input {
     width: 100%;
   }
 }
+
+.fine-actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+}
+
+.fine-actions button {
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .fine-actions {
+    width: 100%;
+    flex-direction: row;
+  }
+
+  .fine-actions button {
+    flex: 1;
+  }
+}
