@@ -1,7 +1,7 @@
 package com.pustakaalay.entity;
 
 import jakarta.persistence.*;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -58,6 +58,7 @@ public class Category {
         this.description = description;
     }
 
+    @JsonIgnore
     public Set<Book> getBooks() {
         return books;
     }
