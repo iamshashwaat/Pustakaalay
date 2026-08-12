@@ -24,3 +24,7 @@ Thumbs.db
 # Logs
 *.log
 pustakaalay_db_backup.sql
+
+# Local database backups
+pustakaalay_db_backup_full.sql
+*.sql
