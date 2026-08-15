@@ -240,6 +240,7 @@ Spring Boot
      | JPA / JDBC
      v
 MySQL 8.4
+```
 # 🗄️ Database
 
 Pustakaalay uses **MySQL 8.4** as its relational database.
