@@ -99,7 +99,7 @@ public class SecurityConfig {
 
                         .requestMatchers(
                                 "/",
-                                "/api/health",
+                                "/api/health/**",
                                 "/api/auth/**"
                         ).permitAll()
 
